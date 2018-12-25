@@ -1,0 +1,12 @@
+<view class="container">
+  <view class="head">
+    <rich-text class="address" nodes="{{address}}" ></rich-text>
+    <view class="today">
+      <text class="temp">{{ temp }}°</text>
+      <view class="des">
+        <text class="text">{{ weatherDes }}</text> |
+        <rich-text class="score" nodes="{{scoreHtml}}" ></rich-text>
+      </view>
+    </view>
+  </view>
+</view>

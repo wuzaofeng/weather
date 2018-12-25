@@ -1,0 +1,13 @@
+/* pages/weather/weather.wxss */
+.address {
+  font-size: 14px;
+  text-align: center;
+}
+
+.address .address_text {
+  font-weight: bold
+}
+
+.address .icon-arrow {
+  font-size: 12px;
+}
