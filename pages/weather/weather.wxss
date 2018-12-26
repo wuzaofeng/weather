@@ -1,5 +1,11 @@
 /* pages/weather/weather.wxss */
+.container {
+  background: linear-gradient(to bottom, #a1c8ffc2 0%,#ffffff 100%);
+}
 .address {
+  display: block;
+  margin-top: 50rpx;
+  margin-bottom: 25rpx;
   font-size: 14px;
   text-align: center;
 }
@@ -11,3 +17,108 @@
 .address .icon-arrow {
   font-size: 12px;
 }
+.tips {
+  position: relative;
+  padding:0 20px 0 40px;
+  max-width: 50%;
+  display: block;
+  margin: 0 auto 40rpx;
+  background-color:#0000002a;
+  border-radius: 3px;
+  height: 30px;
+  line-height: 30px;
+}
+.tips .icon-notice {
+  position: absolute;
+  top: 1px;
+  left: 15px;
+  font-size: 20px;
+  color: #fff;
+}
+.tips .text{
+  display: inline-block;
+  width: 100%;
+  color: #fff;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size: 12px;
+}
+
+.today .temp {
+  font-weight: 100;
+  font-size: 95px;
+  text-align: center;
+}
+
+.today .temp .text {
+  position: relative;
+}
+
+.today .temp .top {
+  position: absolute;
+  right: -50rpx;
+  top: 0;
+  font-style: normal
+}
+
+.des {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.des .text {
+  font-size: 16px;
+}
+
+.des .line {
+  display: block;
+  text-align: center;
+  width: 60rpx;
+  height: 20px;
+  font-size:15px;
+}
+
+.des .score {
+  position: relative;
+  background: #ecb755;
+  padding: 2rpx 10rpx 2rpx 50rpx;
+  font-size: 14px;
+  color: #fff;
+  border-radius: 3px;
+}
+
+.des .score .icon-leaf {
+  position: absolute;
+  top: 0;
+  left: 10rpx;
+  font-size: 20px;
+}
+
+/* .date {
+  display: block;
+  text-align: center;
+}
+
+.date .new,
+.date .old {
+  display: inline-block;
+  color: #fff;
+  padding: 4rpx 10rpx;
+  background-color:#a0a0a05e;
+  vertical-align: top;
+  height: 35rpx;
+}
+
+.date .new {
+  font-size: 13px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.date .old {
+  font-size: 12px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+} */

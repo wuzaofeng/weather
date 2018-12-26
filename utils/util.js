@@ -1,3 +1,4 @@
+import CityCode from '../libs/city-code.js'
 const formatTime = date => {
   const year = date.getFullYear()
   const month = date.getMonth() + 1
@@ -14,6 +15,23 @@ const formatNumber = n => {
   return n[1] ? n : '0' + n
 }
 
-module.exports = {
-  formatTime: formatTime
+// 通过城市获取ID
+const getCity = (cityName) => {
+  const _city = CityCode.find(i => {
+    const regCit = new RegExp(i.cityZh)
+    return regCit.test(cityName)
+  })
+  return {
+    ..._city,
+    id: _city.id.replace('CN', '')
+  }
 }
+
+
+
+module.exports = {
+  formatTime,
+  getCity
+}
+
+

@@ -1,11 +1,18 @@
 <view class="container">
   <view class="head">
     <rich-text class="address" nodes="{{address}}" ></rich-text>
+    <rich-text class="tips" nodes="{{airtipsHtml}}"></rich-text>
     <view class="today">
-      <text class="temp">{{ temp }}°</text>
+      <rich-text class="temp" nodes="{{tempHtml}}"></rich-text>
       <view class="des">
-        <text class="text">{{ weatherDes }}</text> |
+        <text class="text">{{ weatherDes }}</text>
+        <text class="line">|</text>
         <rich-text class="score" nodes="{{scoreHtml}}" ></rich-text>
+      </view>
+      <view class="details">
+        <rich-text class="wind" nodes="{{windHtml}}" ></rich-text>
+        <rich-text class="water" nodes="{{waterHtml}}" ></rich-text>
+        <rich-text class="pa" nodes="{{paHtml}}" ></rich-text>
       </view>
     </view>
   </view>
