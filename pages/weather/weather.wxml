@@ -16,4 +16,24 @@
       </view>
     </view>
   </view>
+  <view class="info">
+    <rich-text class="day" nodes="{{dayHtml}}" ></rich-text>
+    <text class="line"></text>
+    <rich-text class="night" nodes="{{nightHtml}}" ></rich-text>
+  </view>
+  <view class="tit">
+    <text class="text">24小时预报</text>
+  </view>
+  <scroll-view
+    class="echart-wrap"
+    scroll-with-animation
+    scroll-x>
+    <view style="width: 800px;height: 160px">
+      <ec-canvas
+        id="chart-dom"
+        canvas-id="chart"
+        ec="{{ ec }}">
+      </ec-canvas>
+    </view>
+  </scroll-view>
 </view>
