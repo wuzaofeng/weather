@@ -3,7 +3,7 @@ import * as Type from '../../server/type.js'
 import Request from '../../utils/request.js'
 import QQMapWX from '../../libs/qqmap-wx-jssdk.min.js'
 import { getCity } from '../../utils/util.js'
-
+const app = getApp(); 
 const QQMap = new QQMapWX({
   key: 'IGNBZ-Y6PK6-ALQSA-EQENE-EAKWE-WJB3B' // key
 })
@@ -12,7 +12,6 @@ Page({
   data: {
     ec: {
       lazyLoad: true
-      // onInit: initChart
     },
     address: [{
       name: 'i',
@@ -35,63 +34,62 @@ Page({
       },
     }],
     cityCode: '',
-  },
-  onReady() {
-    this.echartsCom = this.selectComponent('#chart-dom');  
+    daysWidth: ''
   },
   onLoad() {
+    this.echartsCom = this.selectComponent('#chart-dom');
+    this.tempEchartsCom = this.selectComponent('#temp-echart');
     this.getLocal()
   },
   getLocal() {
-    const _this = this
     wx.getLocation({
-      success({ latitude, longitude }) {
+      success:({ latitude, longitude }) => {
         const data = {
           lat: latitude,
           lon: longitude,
         }
-        _this.getLocalDetail(data)
+        this.getLocalDetail(data)
       }
     })
   },
   // 获取当前地址的早晚天气详情
   getLocalDetail(data) {
-    const _this = this
     Request({
       url: Type.LocalDetails,
       data,
-      success(res) {
+      success:(res) => {
         const date = res.header.Date
         const { result } = res.data
-        _this.setData({
+        this.setData({
           paHtml: `<i class="iconfont icon-stress"></i><span class="text">${result.pa}Pa</span>`,
           day: {
             temp: result.dayTemp,
             weatherDes: result.dayWeatherDes,
+            windDirection: result.dayWindDirection
           },
           night: {
             temp: result.nightTemp,
             weatherDes: result.nightWeatherDes,
+            windDirection: result.nightWindDirection
           }
         })
 
-        _this.reverseGeocoder(result.lat, result.lon)
+        this.reverseGeocoder(result.lat, result.lon)
       }
     })
   },
   // 解析坐标
   reverseGeocoder(latitude, longitude) {
-    const _this = this
     QQMap.reverseGeocoder({
       location: {
         latitude,
         longitude
       },
-      success(res) {
+      success:(res) => {
         const { result: { address_component: { city, district, street_number } } } = res
         const _city = getCity(city)
-        _this.getRecently(_city.id)
-        _this.setData({
+        this.getRecently(_city.id)
+        this.setData({
           'address[1].children[0].text': `${district} ${street_number} `
         })
       }
@@ -99,33 +97,27 @@ Page({
   },
   // 获取近日天气
   getRecently(citycode) {
-    const _this = this
     const data = {citycode}
     Request({
       url: Type.Recently,
       data,
-      success(res) {
-        const { fc40, fc1h_24 } = res.data
+      success:(res) => {
+        const { fc40, fc1h_24, index3d } = res.data
         const { jh } = fc1h_24
-        // 获取今天温度
-        let dateHtml = '<span class="new">'
-        dateHtml += + fc40[0]['009'].substring(4, 6) + '月' + fc40[0]['009'].substring(6, 8) + '日'
-        dateHtml += '</span>'
-        dateHtml += '<span class="old">(' + fc40[0]['010']
-        dateHtml += ')</span>'
-        _this.setData({
-          dateHtml,
+        this.setData({
           tempHtml: `<span class="text">${jh[0].jb}°</span>`,
           waterHtml: `<i class="iconfont icon-water"></i><span class="text">${jh[0].je}%</span>`,
-          hours: jh
+          sunHtml: `<i class="iconfont icon-sunrise"></i><span class="text">${fc40[0]['014']}<span><i class="iconfont icon-sunset"></i><span class="text">${fc40[0]['015']}<span>`,
+          hours: jh,
+          fc40,
+          index3d: this.formatIndex(index3d)
         })
-        _this.getTianQiApi(citycode)
+        this.getTianQiApi(citycode)
       },
     })
   },
   // 获取天气api
   getTianQiApi(citycode) {
-    const _this = this
     const data = {
       version: 'v1',
       cityid: citycode,
@@ -133,12 +125,13 @@ Page({
     Request({
       url: Type.TianQiApi,
       data,
-      success(res) {
+      success:(res) => {
         const _data = res.data.data
         const tips = _data[0].air_tips
-        const levelColor = _this.levelColor(_data[0].air_level)
+        const levelColor = this.levelColor(_data[0].air_level)
+        const { daysWidth, new7Day } = this.format7Day(_data)
         let html = `<i class="iconfont icon-notice"></i><span class="text">${tips}</span>`
-        _this.setData({
+        this.setData({
           airtipsHtml: html,
           weatherDes: _data[0].wea,
           scoreHtml: `
@@ -146,45 +139,30 @@ Page({
             <i class="iconfont icon-leaf"></i>
             <span>${_data[0].air}${_data[0].air_level}</span>
           </div>`,
-          windHtml: `<i class="iconfont icon-wind"></i><span class="text">${_this.formatWinSpeed(_data[0].win_speed)}</span>`,
+          windHtml: `<i class="iconfont icon-wind"></i><span class="text">${this.formatWinSpeed(_data[0].win_speed)}</span>`,
           dayHtml: `
           <div class="text">
             <span class="name">白天<i class="icon ${levelColor}">${_data[0].air_level}</i></span>
-            <span class="temp">${_this.data.day.temp}°C</span>
+            <span class="temp">${this.data.day.windDirection}/${this.data.day.temp}°C</span>
           </div>
           <div class="text2">
-            <span class="name">${_this.data.day.weatherDes}</span>
+            <span class="name">${this.data.day.weatherDes}</span>
           </div>`,
           nightHtml: `<div class="text">
             <span class="name">晚上<i class="icon ${levelColor}">${_data[0].air_level}</i></span>
-            <span class="temp">${_this.data.night.temp}°C</span>
+            <span class="temp">${this.data.night.windDirection}/${this.data.night.temp}°C</span>
           </div>
           <div class="text2">
-            <span class="name">${_this.data.night.weatherDes}</span>
+            <span class="name">${this.data.night.weatherDes}</span>
           </div>
           `,
+          day7: new7Day,
+          daysWidth 
         })
-        _this.initEchart(_data[0])
+        this.initEchart(_data[0])
+        this.init7DayEchart(new7Day)
       }
     })
-  },
-  levelColor (level) {
-    let color = ''
-    switch(level) {
-      case "优":
-        color = 'green'
-        break;
-      default:
-        color = 'yellow'
-    }
-    return color
-  },
-  formatWinSpeed(speed) {
-    let _speed = Number(speed[1]) - 1
-    if (isNaN) {
-      _speed = Number(speed[0]) - 1
-    }
-    return _speed + '级'
   },
   initEchart(data) {
     const { tem1: max, tem2: min, hours } = data
@@ -200,19 +178,39 @@ Page({
         color: ["#add8fd"],
         grid: {
           containLabel: true,
-          left: '0',
-          top: '30px',
-          right: '0',
-          bottom: '20px'
+          x: 0,
+          x2: 0,
+          y: 30,
+          y2: 30,
         },
         xAxis: {
           type: 'category',
           axisTick: false,
           boundaryGap: false,
-          data: _hours.map(i => ({
-            ...i,
-            value: i.xData
-          })),
+          data: _hours.map((i, n) => {
+            let align = ''
+            let padding = 0
+            switch(n) {
+              case 0:
+                align = 'left'
+                break;
+              case _hours.length - 1:
+                align = 'right'
+                break;
+              default:
+                align = 'center'
+                padding = [0,0,0,5]
+                break;
+            }
+            return {
+              ...i,
+              value: i.xData,
+              textStyle: {
+                align,
+                padding,
+              }
+            }
+          }),
           axisLine: {
             show: false,
             lineStyle: {
@@ -221,8 +219,8 @@ Page({
           },
           axisLabel: {
             interval: 0,//横轴信息全部显示
-            rotate: -30 //-30度角倾斜显示
-          }
+            rotate: 0, //-30度角倾斜显示
+          },
         },
         yAxis: {
           x: 'center',
@@ -246,15 +244,13 @@ Page({
           },
           label: {
             show: true,
-            formatter: function (item) {
-              return item.value + '°C'
-            }
+            formatter: '{c}°C'
           },
           data: _hours.map((i, index) => ({
             ...i,
             value: i.temp,
             label: {
-              offset: index === 0 ? [13, 0] : [10, 0]
+              offset: index === 0 ? [13, 0] : [0, 0]
             },
           }))
         }]
@@ -264,6 +260,119 @@ Page({
       this.chart = chart;
       return chart;
     });
+  },
+  init7DayEchart(data) {
+    const low = []
+    const high = []
+    let min = 9999
+    let max = -9999
+    for (let i = 0; i < data.length; i++) {
+      min = min < data[i].min ? min : data[i].min
+      max = max > data[i].min ? max : data[i].max
+      low.push(data[i].min)
+      high.push(data[i].max)
+    }
+    this.tempEchartsCom.init((canvas, width, height) => {
+      const _this = this
+      const chart = echarts.init(canvas, null, {
+        width: width,
+        height: height
+      });
+      const option = {
+        calcubale: false,
+        animation: true,
+        xAxis: [{
+          type: "category",
+          boundaryGap: false,
+          splitLine: false,
+          axisLabel: false,
+          splitArea: false,
+          axisLine: false,
+          axisTick: false,
+        }],
+        yAxis: [{
+          splitLine: false,
+          scale: false,
+          allowDecimals: false,
+          splitNumber: "4",
+          min: min * 1,
+          max: max * 1,
+          type: "value",
+          show: false,
+          boundaryGap: false,
+          splitArea: false,
+          axisLine: false,
+          axisTick: false,
+        }],
+        grid: {
+          x: 40,
+          x2: 40,
+          y: 40,
+          y2: 40,
+          borderWidth: 0
+        },
+        series: [{
+          type: "line",
+          smooth: true,
+          symbol: "circle",
+          symbolSize: 5,
+          itemStyle: {
+            color: "#e69019"
+          },
+          lineStyle: {
+            color: "#ffc16c",
+            width: 1
+          },
+          label: {
+            color: "#333",
+            show: true,
+            fontSize: 14,
+            position: "top",
+            formatter: '{c}°'
+          },
+          data: high
+        }, {
+          type: "line",
+          smooth: true,
+          symbol: "circle",
+          symbolSize: 5,
+          itemStyle: {
+            color: "#5bb0f9",
+          },
+          lineStyle: {
+            color: "#add8fd",
+            width: 1
+          },
+          label: {
+            color: "#333",
+            fontSize: 14,
+            show: true,
+            position: "bottom",
+            formatter: '{c}°'
+          },
+          data: low
+        }],
+        animation: false
+      };;
+
+      chart.setOption(option)
+      this.tempEchart = chart;
+      return chart;
+    });
+  },
+  levelColor (level) {
+    let color = ''
+    switch(level) {
+      case "优":
+        color = 'green'
+        break;
+      default:
+        color = 'yellow'
+    }
+    return color
+  },
+  formatWinSpeed(speed) {
+    return Number(/\d/g.exec(speed)) - 1 + '级'
   },
   formatHours(tqHours) {
     const _recHours = this.data.hours
@@ -286,5 +395,45 @@ Page({
   },
   formatTemp(temp) {
     return temp.replace(/[^0-9]/ig, "")
+  },
+  format7Day(tq7Day) {
+    const rec40Day = this.data.fc40
+    const width = Math.ceil(app.globalData.systemInfo.windowWidth / 5)
+    const new7Day = tq7Day.map((i, n) => {
+      const week = i.week.replace(/星期/g, '')
+      const date = i.date.split('-')
+      const isToday = /今/g.test(i.day)
+      const wea = /转/g.test(i.wea) ? i.wea.split('转') : [i.wea, i.wea]
+      const speed = /转/g.test(i.win_speed) ? i.win_speed.split('转')[0] : i.win_speed
+      return {
+        week,
+        isToday,
+        wea,
+        date: date[1] + '/' + date[2],
+        score: rec40Day[n]['012'],
+        max: Number(this.formatTemp(i.tem1)),
+        min: Number(this.formatTemp(i.tem2)),
+        win: i.win,
+        speed,
+        width: width + 'px'
+      }
+    })
+    return {
+      daysWidth: width * 7 + 'px',
+      new7Day
+    }
+  },
+  formatIndex(index3d) {
+    const style = `
+      width: ${(app.globalData.systemInfo.windowWidth / 4)}px;
+      height: ${(app.globalData.systemInfo.windowWidth / 4)}px 
+    `
+    const _index = index3d.i.map(i => ({
+      icon: i.i1,
+      name: i.i2.replace(/指数/, ''),
+      value: i.i4,
+      style
+    }))
+    return _index
   }
 })

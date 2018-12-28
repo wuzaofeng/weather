@@ -7,3 +7,16 @@
   flex-direction: column;
   box-sizing: border-box;
 } 
+
+.clear {
+  zoom:1;
+}
+
+.clear:after {
+  clear:both;
+  content:'';
+  display:block;
+  width:0;
+  height:0;
+  visibility:hidden;
+}
