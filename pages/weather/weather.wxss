@@ -3,11 +3,23 @@
   background: linear-gradient(to bottom, #a1c8ffc2 0%,#ffffff 100%);
 }
 .yellow {
-  background: #ecb755;
+  background: #ecc455;
+}
+
+.orange {
+  background: #ec9e55;
 }
 
 .green {
   background: rgb(107, 196, 107);
+}
+
+.blue {
+  background: rgb(106, 177, 224);
+}
+
+.red {
+  background: rgb(238, 130, 130);
 }
 
 .address {
@@ -155,7 +167,9 @@
 }
 
 .info .day .text,
-.info .night .text {
+.info .day .text2,
+.info .night .text,
+.info .night .text2 {
   display: flex;
   align-items: space-between;
   justify-content: space-between;
@@ -325,4 +339,54 @@
   display: block;
   font-size: 12px;
   color: #0000002a;
+}
+
+.index-wrap .index .img {
+  width: 25px;
+  height: 25px;
+  margin-bottom: 5px;
+}
+
+.indexState {
+  margin-right: 15px;
+  font-size: 12px;
+  color: #0000007a;
+}
+
+.alarm {
+  position: relative;
+  display: block;
+  margin: auto;
+  height: 30px;
+  width: 100px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.alarm .alarm-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-block;
+  height: 30px;
+  width: 100px;
+  line-height: 30px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #fff;
+  opacity: 0;
+  transition: all 2s ease;
+}
+.alarm .alarm-item.active {
+  opacity: 1;
+}
+
+.we-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+
+.day {
+  background-size: 30px 30px;
 }

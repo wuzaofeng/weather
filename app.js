@@ -1,7 +1,6 @@
 //app.js
 App({
-  globalData: {
-  },
+  globalData: {},
   onLaunch: function () {
     // 展示本地存储能力
     var logs = wx.getStorageSync('logs') || []
@@ -34,9 +33,6 @@ App({
         }
       }
     })
-
-
-   
 
     this.getSystemInfo() 
   },

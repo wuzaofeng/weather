@@ -1,4 +1,5 @@
 import CityCode from '../libs/city-code.js'
+import makePy from '../libs/makePy.js' 
 const formatTime = date => {
   const year = date.getFullYear()
   const month = date.getMonth() + 1
@@ -26,8 +27,6 @@ const getCity = (cityName) => {
     id: _city.id.replace('CN', '')
   }
 }
-
-
 
 module.exports = {
   formatTime,

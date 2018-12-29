@@ -2,7 +2,9 @@ import * as echarts from '../../ec-canvas/echarts';
 import * as Type from '../../server/type.js'
 import Request from '../../utils/request.js'
 import QQMapWX from '../../libs/qqmap-wx-jssdk.min.js'
+import queryWeather from '../../libs/weather.js'
 import { getCity } from '../../utils/util.js'
+
 const app = getApp(); 
 const QQMap = new QQMapWX({
   key: 'IGNBZ-Y6PK6-ALQSA-EQENE-EAKWE-WJB3B' // key
@@ -34,7 +36,11 @@ Page({
       },
     }],
     cityCode: '',
-    daysWidth: ''
+    daysWidth: '',
+    indexState: false,
+    indexLength: 8,
+    currentAlarm: 0,
+    lunCalender: ''
   },
   onLoad() {
     this.echartsCom = this.selectComponent('#chart-dom');
@@ -61,7 +67,7 @@ Page({
         const date = res.header.Date
         const { result } = res.data
         this.setData({
-          paHtml: `<i class="iconfont icon-stress"></i><span class="text">${result.pa}Pa</span>`,
+          paHtml: `<i class="iconfont icon-stress"></i><span class="text">${result.pa}hPa</span>`,
           day: {
             temp: result.dayTemp,
             weatherDes: result.dayWeatherDes,
@@ -89,15 +95,19 @@ Page({
         const { result: { address_component: { city, district, street_number } } } = res
         const _city = getCity(city)
         this.getRecently(_city.id)
+        this.getLocalInfo(_city.id)
         this.setData({
-          'address[1].children[0].text': `${district} ${street_number} `
+          'address[1].children[0].text': `${district} ${street_number} `,
+          citycode: _city.id
         })
       }
     })
   },
   // 获取近日天气
   getRecently(citycode) {
-    const data = {citycode}
+    const data = {
+      citycode
+    }
     Request({
       url: Type.Recently,
       data,
@@ -110,7 +120,7 @@ Page({
           sunHtml: `<i class="iconfont icon-sunrise"></i><span class="text">${fc40[0]['014']}<span><i class="iconfont icon-sunset"></i><span class="text">${fc40[0]['015']}<span>`,
           hours: jh,
           fc40,
-          index3d: this.formatIndex(index3d)
+          index3d: this.formatIndex(index3d, fc40[0]['010'])
         })
         this.getTianQiApi(citycode)
       },
@@ -147,6 +157,7 @@ Page({
           </div>
           <div class="text2">
             <span class="name">${this.data.day.weatherDes}</span>
+             <img class="we-icon" src="../../images/weather/${queryWeather(this.data.night.weatherDes, 'd').image}.png" />
           </div>`,
           nightHtml: `<div class="text">
             <span class="name">晚上<i class="icon ${levelColor}">${_data[0].air_level}</i></span>
@@ -154,13 +165,47 @@ Page({
           </div>
           <div class="text2">
             <span class="name">${this.data.night.weatherDes}</span>
+            <img class="we-icon" src="../../images/weather/${queryWeather(this.data.night.weatherDes, 'n').image}.png" />
           </div>
           `,
           day7: new7Day,
           daysWidth 
         })
+        
         this.initEchart(_data[0])
         this.init7DayEchart(new7Day)
+      }
+    })
+  },
+  getLocalInfo(citycode) {
+    const data = {
+      citycode
+    }
+    Request({
+      url: Type.LocalInfo,
+      data,
+      success: (res) => {
+        const arr = res.data[`alarmDZ${citycode}`].w
+        const gradeObj = { "01": 'blue', "02": 'yellow', "03": 'orange', "04": 'red', "91": 'white' }
+        const length = arr.length
+        const alarm = arr.map(i => {
+          let color = ''
+          if (i.w6 == "00") {
+            color = i.w7 == "蓝色" && 'blue' || i.w7 == "黄色" && 'yellow' || i.w7 == "橙色" && 'orange' || i.w7 == "红色" && 'red' || '';
+          } else {
+            color = gradeObj[i.w6];
+          };
+          return {
+            ...i,
+            color
+          }
+        })
+
+        this.setData({
+          alarmLength: length,
+          alarm
+        })
+        this.alarmTimeout()
       }
     })
   },
@@ -267,11 +312,12 @@ Page({
     let min = 9999
     let max = -9999
     for (let i = 0; i < data.length; i++) {
-      min = min < data[i].min ? min : data[i].min
-      max = max > data[i].min ? max : data[i].max
+      min = Math.min(data[i].min, min)
+      max = Math.max(data[i].max, max)
       low.push(data[i].min)
       high.push(data[i].max)
     }
+
     this.tempEchartsCom.init((canvas, width, height) => {
       const _this = this
       const chart = echarts.init(canvas, null, {
@@ -423,7 +469,7 @@ Page({
       new7Day
     }
   },
-  formatIndex(index3d) {
+  formatIndex(index3d, lunCalender) {
     const style = `
       width: ${(app.globalData.systemInfo.windowWidth / 4)}px;
       height: ${(app.globalData.systemInfo.windowWidth / 4)}px 
@@ -432,8 +478,41 @@ Page({
       icon: i.i1,
       name: i.i2.replace(/指数/, ''),
       value: i.i4,
-      style
+      style,
+      src: `../../images/index/${i.i1}.png`
     }))
+
+    // 添加万年历
+    _index.unshift({
+      icon: 'wnl',
+      name: '万年历',
+      value: lunCalender,
+      style,
+      src: `../../images/index/wnl.png`
+    })
     return _index
+  },
+  toogleIndexState(e) {
+    const _state = this.data.indexState
+    const _length = _state ? 8 : this.data.index3d.length
+    this.setData({
+      indexState: !_state,
+      indexLength: _length
+    })
+  },
+  alarmTimeout() {
+    clearInterval(this.alarmTimer)
+    this.alarmTimer = setTimeout(() => {
+      let _current = this.data.currentAlarm
+      _current ++
+      if (_current == this.data.alarmLength) {
+        _current = 0
+      }
+      this.setData({
+        currentAlarm: _current
+      }, () => {
+        this.alarmTimeout()
+      })
+    }, 4000)
   }
 })
