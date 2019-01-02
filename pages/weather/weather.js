@@ -40,9 +40,13 @@ Page({
     indexState: false,
     indexLength: 8,
     currentAlarm: 0,
-    lunCalender: ''
+    lunCalender: '',
+    loading: true
   },
   onLoad() {
+    wx.showLoading({
+      title: '加载中',
+    })
     this.echartsCom = this.selectComponent('#chart-dom');
     this.tempEchartsCom = this.selectComponent('#temp-echart');
     this.getLocal()
@@ -169,8 +173,10 @@ Page({
           </div>
           `,
           day7: new7Day,
-          daysWidth 
+          daysWidth,
+          loading: false
         })
+        wx.hideLoading()
         
         this.initEchart(_data[0])
         this.init7DayEchart(new7Day)
@@ -460,7 +466,9 @@ Page({
         min: Number(this.formatTemp(i.tem2)),
         win: i.win,
         speed,
-        width: width + 'px'
+        width: width + 'px',
+        src: [`../../images/weather/${queryWeather(wea[0], 'd').image}.png`,
+        `../../images/weather/${queryWeather(wea[1], 'n').image}.png`],
       }
     })
     return {
