@@ -157,7 +157,7 @@ Page({
           </div>
           <div class="text2">
             <span class="name">${this.data.day.weatherDes}</span>
-             <img class="we-icon" src="../../images/weather/${queryWeather(this.data.night.weatherDes, 'd').image}.png" />
+             <img class="we-icon" src="../../images/weather/${queryWeather(this.data.day.weatherDes, 'd').image}.png" />
           </div>`,
           nightHtml: `<div class="text">
             <span class="name">晚上<i class="icon ${levelColor}">${_data[0].air_level}</i></span>
@@ -200,7 +200,6 @@ Page({
             color
           }
         })
-
         this.setData({
           alarmLength: length,
           alarm

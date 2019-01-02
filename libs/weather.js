@@ -5,15 +5,22 @@ const textArr = ["晴", "阴", "多云", "雨夹雪", "小雨", "中雨", "阵�
 // #FBC445
 
 // 蓝色
-// #a1c8ffc2
+// #c2e1fd
 
 // 暗色
+// #96b8d6
+
+// 雪
 // #8a8a8a
+
+// 雨
+// #2d99f4
 
 const weather = {}
 // 过滤textArr
 for (let i = 0; i < textArr.length; i++) {
   const res = makePy(textArr[i])[0].toLowerCase();
+  const image = i < 31 ? res : 'yzdy'
   weather[textArr[i]] = {
     name: textArr[i],
     type: res,
@@ -22,10 +29,9 @@ for (let i = 0; i < textArr.length; i++) {
 }
 
 // 包含白天和晚上的
-const hasDN = ['晴', '多云']
+const hasDN = ['晴', '多云', '阵雨', '晴转多云', '小雪转晴' ,'多云转晴']
 
 function queryWeather(str, state = '') {
-  console.log(state)
   const _obj = weather[str]
   const _has = hasDN.includes(str)
   return {

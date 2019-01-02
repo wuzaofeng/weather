@@ -5,7 +5,7 @@
     <rich-text class="tips" nodes="{{airtipsHtml}}"></rich-text>
     <view class="today">
       <rich-text class="temp" nodes="{{tempHtml}}"></rich-text>
-      <view class="alarm" wx:if="alarmLength">
+      <view class="alarm" wx:if="{{alarmLength}}">
         <view class="alarm-item {{ item.color }} {{ currentAlarm === index ? 'active' : '' }}" wx:for="{{alarm}}" wx:key="{{index}}">{{item.w5}}预警</view>
       </view>
       <view class="des">
