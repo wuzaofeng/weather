@@ -1,7 +1,7 @@
 <view class="page container">
   <view wx:if="!loading">
     <view class="head">
-      <rich-text class="address" nodes="{{address}}" ></rich-text>
+      <rich-text class="address" nodes="{{address}}" bindtap="onTapAddress"></rich-text>
       <rich-text class="tips" nodes="{{airtipsHtml}}"></rich-text>
       <view class="today">
         <rich-text class="temp" nodes="{{tempHtml}}"></rich-text>

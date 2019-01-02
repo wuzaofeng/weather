@@ -1,14 +1,11 @@
 import * as echarts from '../../ec-canvas/echarts';
 import * as Type from '../../server/type.js'
 import Request from '../../utils/request.js'
-import QQMapWX from '../../libs/qqmap-wx-jssdk.min.js'
 import queryWeather from '../../libs/weather.js'
 import { getCity } from '../../utils/util.js'
+import QQMap from '../../utils/qq-map.js'
 
 const app = getApp(); 
-const QQMap = new QQMapWX({
-  key: 'IGNBZ-Y6PK6-ALQSA-EQENE-EAKWE-WJB3B' // key
-})
 
 Page({
   data: {
@@ -43,13 +40,17 @@ Page({
     lunCalender: '',
     loading: true
   },
-  onLoad() {
+  onLoad(options) {
     wx.showLoading({
       title: '加载中',
     })
     this.echartsCom = this.selectComponent('#chart-dom');
     this.tempEchartsCom = this.selectComponent('#temp-echart');
-    this.getLocal()
+    if (options.hasOwnProperty('lat') && options.hasOwnProperty('lng')) {
+      this.getLocalDetail({ lat: options.lat, lon: options.lng  })
+    } else {
+      this.getLocal()
+    }
   },
   getLocal() {
     wx.getLocation({
@@ -445,7 +446,7 @@ Page({
     return hours
   },
   formatTemp(temp) {
-    return temp.replace(/[^0-9]/ig, "")
+    return temp.replace(/℃/ig, "")
   },
   format7Day(tq7Day) {
     const rec40Day = this.data.fc40
@@ -521,5 +522,10 @@ Page({
         this.alarmTimeout()
       })
     }, 4000)
+  },
+  onTapAddress() {
+    wx.navigateTo({
+      url: '../search/search'
+    })
   }
 })
