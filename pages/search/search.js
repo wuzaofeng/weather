@@ -6,7 +6,7 @@ Page({
     result: [],
     value: '',
     hotCity,
-    history: []
+    history: ["北京市", "上海市", "广州市"]
   },
   inputHandle(e) {
     const { value } = e.detail
@@ -21,6 +21,10 @@ Page({
         }
       });
     }
+  },
+  onLoad() {
+    console.log(this.getLocal())
+    this.history = this.getLocal()
   },
   cancelHandle() {
     wx.navigateBack()
@@ -44,8 +48,12 @@ Page({
       url: `../weather/weather`
     })
   },
+  delHandle(e) {
+
+  },
   hotHandle(e) {
     const { value } = e.currentTarget.dataset
+    this.setLocal(value)
     QQMap.geocoder({
       address: value,
       success: (res) => {
@@ -58,8 +66,17 @@ Page({
   },
   // 设置历史记录
   setLocal(val) {
-    const arr = wx.getStorageInfoSync().split(',')
+    const arr = this.getLocal()
     if (!arr.includes(val)) {
+      console.log(arr)
+      arr.push(val)
+      wx.setStorageSync('history', arr)
     }
+  },
+  getLocal() {
+    return wx.getStorageSync('history') ? wx.getStorageSync('history') : []
+  },
+  delHandle(e) {
+    const { value } = e.currentTarget.dataset
   }
 })

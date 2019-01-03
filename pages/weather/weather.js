@@ -301,6 +301,7 @@ Page({
             ...i,
             value: i.temp,
             label: {
+              position: i.temp < 0 ? 'bottom' : 'top',
               offset: index === 0 ? [13, 0] : [0, 0]
             },
           }))
