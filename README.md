@@ -35,7 +35,7 @@
 
 ## 视图展示
 ##### 首页
-![首页](./gif/home.gif)
+![首页](https://github.com/wuzaofeng/weather/blob/master/gif/home.gif)
 
 
 ##### 搜索✌️
