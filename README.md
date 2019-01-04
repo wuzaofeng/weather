@@ -35,11 +35,7 @@
 ```
 ## 视图展示
 ##### 首页
-<<<<<<< Updated upstream
-![首页](https://github.com/wuzaofeng/weather/blob/master/gif/home.gif)
-=======
 ![首页](/gif/home.gif)
->>>>>>> Stashed changes
 
 
 ##### 搜索✌️
@@ -47,8 +43,4 @@
 
 
 ##### 关键字搜索✌️
-<<<<<<< Updated upstream
-![关键字搜索✌️](./gif/search2.gif)
-=======
 ![关键字搜索✌️](/gif/search2.gif)
->>>>>>> Stashed changes
