@@ -1,11 +1,12 @@
 import QQMap from '../../utils/qq-map.js'
-import { hotCity } from '../../config.js'
+
+const app = getApp(); 
 Page({
   data: {
     isSearch: false,
     result: [],
     value: '',
-    hotCity,
+    hotCity: app.globalData.hotCity,
     history: []
   },
   inputHandle(e) {

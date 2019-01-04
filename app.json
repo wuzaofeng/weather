@@ -1,7 +1,7 @@
 {
   "pages":[
-    "pages/search/search",
     "pages/weather/weather",
+    "pages/search/search",
     "pages/logs/logs"
   ],
   "window":{
