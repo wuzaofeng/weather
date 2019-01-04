@@ -6,7 +6,7 @@ Page({
     result: [],
     value: '',
     hotCity,
-    history: ["北京市", "上海市", "广州市"]
+    history: []
   },
   inputHandle(e) {
     const { value } = e.detail
@@ -23,8 +23,9 @@ Page({
     }
   },
   onLoad() {
-    console.log(this.getLocal())
-    this.history = this.getLocal()
+    this.setData({
+      history: this.getLocal()
+    })
   },
   cancelHandle() {
     wx.navigateBack()
@@ -41,15 +42,15 @@ Page({
     })
   },
   clearHistory() {
-    wx.clearStorage()
+    wx.removeStorage({ key: 'history'})
+    this.setData({
+      history: []
+    })
   },
   dwHandle() {
     wx.navigateTo({
       url: `../weather/weather`
     })
-  },
-  delHandle(e) {
-
   },
   hotHandle(e) {
     const { value } = e.currentTarget.dataset
@@ -78,5 +79,14 @@ Page({
   },
   delHandle(e) {
     const { value } = e.currentTarget.dataset
+    const arr = this.getLocal()
+    if (arr.includes(value)) {
+      const index = arr.indexOf(value)
+      arr.splice(index, 1)
+      wx.setStorageSync('history', arr)
+      this.setData({
+        history: arr
+      })
+    }
   }
 })

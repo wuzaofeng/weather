@@ -35,9 +35,9 @@
     <view class="history clear">
       <view class="item" wx:key="{{index}}" wx:for="{{history}}" data-value="{{item}}" bindtap="hotHandle">
         {{item}}
-        <text class="iconfont icon-del" bindtap="delHandle" data-value="{{item}}" ></text>
+        <text class="iconfont icon-del" catchtap="delHandle" data-value="{{item}}" ></text>
       </view>
-      <text class="clear-h" wx:if="{{ history.length }}"  bindtap="clearHistory">清空历史</text>
     </view>
+    <text class="clear-h" wx:if="{{ history.length }}"  bindtap="clearHistory">清空历史</text>
   </view>
 </view>
